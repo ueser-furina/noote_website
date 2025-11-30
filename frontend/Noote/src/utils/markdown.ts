@@ -3,7 +3,7 @@ import hljs from 'highlight.js'
 
 // 配置 marked
 marked.setOptions({
-  highlight: function (code, lang) {
+  highlight: function (code: string, lang: string) {
     if (lang && hljs.getLanguage(lang)) {
       try {
         return hljs.highlight(code, { language: lang }).value
@@ -15,7 +15,7 @@ marked.setOptions({
   },
   breaks: true,
   gfm: true,
-})
+} as any)
 
 export function renderMarkdown(content: string): string {
   return marked(content) as string

@@ -263,7 +263,9 @@ async function handleDrop(dropIndex: number) {
 
   const newNotes = [...notes.value]
   const [draggedNote] = newNotes.splice(draggedIndex, 1)
-  newNotes.splice(dropIndex, 0, draggedNote)
+  if (draggedNote) {
+    newNotes.splice(dropIndex, 0, draggedNote)
+  }
 
   notes.value = newNotes
 

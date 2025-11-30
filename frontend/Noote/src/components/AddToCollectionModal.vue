@@ -74,7 +74,7 @@ async function loadCollections() {
     // 檢查每個合集是否已包含該筆記
     for (const collection of myCollections) {
       const notes = await collectionsService.getCollectionNotes(collection.id!)
-      collection.has_note = notes.some(note => note.id === props.noteId)
+      collection.has_note = notes.some((note: any) => note.id === props.noteId)
     }
 
     collections.value = myCollections
