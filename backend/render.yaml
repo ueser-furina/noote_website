@@ -14,7 +14,7 @@ services:
     name: roll-call-ai-backend
     env: python
     plan: free
-    runtime: python-3.12.8
+    runtime: python-3.11.9
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
