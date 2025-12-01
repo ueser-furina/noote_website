@@ -6,11 +6,55 @@ import { onMounted, ref } from 'vue'
 const router = useRouter()
 const userStore = useUserStore()
 const scrollY = ref(0)
+const typewriterText = ref('')
+const showSecondText = ref(false)
+
+// 打字機效果
+const texts = [
+  '筆記散落各處？',
+  '讓 AI 為你整合'
+]
+let textIndex = 0
+let charIndex = 0
+let isDeleting = false
+
+const typeWriter = () => {
+  const currentText = texts[textIndex]
+  if (!currentText) return
+
+  if (!isDeleting && charIndex < currentText.length) {
+    typewriterText.value = currentText.substring(0, charIndex + 1)
+    charIndex++
+    setTimeout(typeWriter, 100)
+  } else if (!isDeleting && charIndex === currentText.length) {
+    // 暫停後開始刪除
+    setTimeout(() => {
+      isDeleting = true
+      typeWriter()
+    }, 2000)
+  } else if (isDeleting && charIndex > 0) {
+    typewriterText.value = currentText.substring(0, charIndex - 1)
+    charIndex--
+    setTimeout(typeWriter, 50)
+  } else if (isDeleting && charIndex === 0) {
+    isDeleting = false
+    textIndex = (textIndex + 1) % texts.length
+    if (textIndex === 1) {
+      showSecondText.value = true
+    }
+    setTimeout(typeWriter, 500)
+  }
+}
 
 onMounted(() => {
   window.addEventListener('scroll', () => {
     scrollY.value = window.scrollY
   })
+
+  // 延遲啟動打字機效果
+  setTimeout(() => {
+    typeWriter()
+  }, 500)
 })
 
 function goToNotes() {
@@ -23,6 +67,23 @@ function goToMyNotes() {
 
 function goToLogin() {
   router.push('/login')
+}
+
+// 生成隨機粒子樣式
+function getParticleStyle(index: number) {
+  const size = Math.random() * 3 + 1
+  const left = Math.random() * 100
+  const duration = Math.random() * 20 + 10
+  const delay = Math.random() * 5
+
+  return {
+    width: `${size}px`,
+    height: `${size}px`,
+    left: `${left}%`,
+    animationDuration: `${duration}s`,
+    animationDelay: `${delay}s`,
+    opacity: Math.random() * 0.5 + 0.3
+  }
 }
 </script>
 
@@ -50,17 +111,26 @@ function goToLogin() {
 
     <!-- Hero Section -->
     <section class="hero">
+      <!-- Animated Background -->
+      <div class="particles-bg">
+        <div class="particle" v-for="i in 50" :key="i" :style="getParticleStyle(i)"></div>
+      </div>
+
       <div class="hero-content">
-        <h1 class="hero-title">
-          <span class="title-line">智能課堂助理</span>
-          <span class="title-line gradient-text">AI 驅動筆記平台</span>
-        </h1>
-        <p class="hero-subtitle">
-          自動錄音、即時轉錄、智能摘要<br>
-          讓學習變得更輕鬆、更高效
+        <!-- Typewriter Title -->
+        <div class="typewriter-container">
+          <h1 class="typewriter-title">
+            {{ typewriterText }}
+            <span class="cursor">|</span>
+          </h1>
+        </div>
+
+        <p class="hero-subtitle" :class="{ 'fade-in': showSecondText }">
+          使用 AI 技術整合多篇筆記<br>
+          讓知識更有條理，學習更有效率
         </p>
-        <div class="cta-buttons">
-          <button class="cta-primary" @click="goToNotes">
+        <div class="cta-buttons" :class="{ 'fade-in': showSecondText }">
+          <button class="cta-primary pulse-button" @click="goToNotes">
             <span>探索筆記</span>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -308,6 +378,37 @@ function goToLogin() {
   overflow: hidden;
 }
 
+/* Particles Background */
+.particles-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  bottom: -10px;
+  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+  border-radius: 50%;
+  animation: float-up linear infinite;
+  pointer-events: none;
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
 .hero::before {
   content: '';
   position: absolute;
@@ -319,6 +420,7 @@ function goToLogin() {
     radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
   animation: pulse 8s ease-in-out infinite;
+  z-index: 0;
 }
 
 @keyframes pulse {
@@ -333,32 +435,38 @@ function goToLogin() {
   max-width: 900px;
 }
 
-.hero-title {
+/* Typewriter Effect */
+.typewriter-container {
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.typewriter-title {
   font-size: clamp(2.5rem, 8vw, 5rem);
   font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.title-line {
-  display: block;
-  animation: fadeInUp 0.8s ease-out;
-}
-
-.title-line:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.gradient-text {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   background-size: 200% auto;
   animation: gradientShift 3s linear infinite;
+  display: inline-block;
+}
+
+.cursor {
+  display: inline-block;
+  width: 3px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin-left: 5px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 @keyframes gradientShift {
@@ -381,7 +489,12 @@ function goToLogin() {
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 3rem;
   line-height: 1.6;
-  animation: fadeInUp 0.8s ease-out 0.4s both;
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+}
+
+.hero-subtitle.fade-in {
+  opacity: 1;
 }
 
 .cta-buttons {
@@ -389,7 +502,12 @@ function goToLogin() {
   gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
-  animation: fadeInUp 0.8s ease-out 0.6s both;
+  opacity: 0;
+  transition: opacity 0.8s ease-out 0.3s;
+}
+
+.cta-buttons.fade-in {
+  opacity: 1;
 }
 
 .cta-primary,
@@ -422,6 +540,23 @@ function goToLogin() {
 
 .cta-primary:hover svg {
   transform: translateX(4px);
+}
+
+/* Pulse Animation for Primary Button */
+.pulse-button {
+  position: relative;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3),
+                0 0 40px rgba(102, 126, 234, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.5),
+                0 0 60px rgba(102, 126, 234, 0.4);
+  }
 }
 
 .cta-secondary {
