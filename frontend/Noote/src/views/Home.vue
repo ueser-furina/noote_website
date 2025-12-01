@@ -11,8 +11,8 @@ const showSecondText = ref(false)
 
 // 打字機效果
 const texts = [
-  '筆記散落各處？',
-  '讓 AI 為你整合'
+  '筆記智能助理',
+  'AI筆記平台'
 ]
 let textIndex = 0
 let charIndex = 0
