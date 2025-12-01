@@ -207,11 +207,11 @@ function getParticleStyle(_index: number) {
     <section class="stats">
       <div class="stats-content">
         <div class="stat-item">
-          <div class="stat-number">10K+</div>
+          <div class="stat-number">10+</div>
           <div class="stat-label">筆記數量</div>
         </div>
         <div class="stat-item">
-          <div class="stat-number">95%</div>
+          <div class="stat-number">80%</div>
           <div class="stat-label">轉錄準確率</div>
         </div>
         <div class="stat-item">
