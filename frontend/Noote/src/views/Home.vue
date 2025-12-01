@@ -7,7 +7,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const scrollY = ref(0)
 const typewriterText = ref('')
-const showSecondText = ref(false)
+const showSecondText 我= ref(false)
 
 // 打字機效果
 const texts = [
@@ -100,6 +100,7 @@ function getParticleStyle(_index: number) {
           <router-link to="/notes" class="nav-link">公開筆記</router-link>
           <router-link to="/collections/public" class="nav-link">合集</router-link>
           <router-link v-if="userStore.isLoggedIn" to="/my-notes" class="nav-link">我的筆記</router-link>
+          <router-link v-if="userStore.isLoggedIn" to="/my-collections" class="nav-link">我的合集</router-link>
           <router-link v-if="userStore.isLoggedIn" to="/create-note" class="nav-link">上傳</router-link>
           <button v-if="userStore.isLoggedIn" @click="userStore.logout(); router.push('/login')" class="nav-btn logout">
             登出
