@@ -137,7 +137,11 @@ def search_notes(
     return result
 
 @router.get("/{note_id}", response_model=NoteResponse)
-def get_note(note_id: int, db: Session = Depends(get_db)):
+def get_note(
+    note_id: int,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
     """獲取單個筆記"""
     note = db.query(Note).filter(Note.id == note_id).first()
 
@@ -147,12 +151,13 @@ def get_note(note_id: int, db: Session = Depends(get_db)):
             detail="筆記不存在"
         )
 
-    # 檢查筆記是否公開
+    # 檢查筆記是否公開，如果是私密筆記則需要是擁有者才能訪問
     if not note.is_public:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="此筆記為私密筆記"
-        )
+        if not current_user or note.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="此筆記為私密筆記"
+            )
 
     note_response = NoteResponse.from_orm(note)
     note_response.owner_username = note.owner.username
