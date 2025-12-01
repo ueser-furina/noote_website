@@ -7,7 +7,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const scrollY = ref(0)
 const typewriterText = ref('')
-const showSecondText 我= ref(false)
+const showSecondText = ref(false)
 
 // 打字機效果
 const texts = [
